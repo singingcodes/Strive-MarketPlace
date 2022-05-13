@@ -11,9 +11,12 @@ const productSchema = {
     isString: { errorMessage: "description is required" },
   },
 
-  //   imageUrl: {
-  //     in: ["body"],
-  // },
+  "reviews.rate": {
+    in: ["body"],
+  },
+  "reviews.comment": {
+    in: ["body"],
+  },
 
   brand: {
     in: ["body"],
@@ -29,6 +32,19 @@ const productSchema = {
     isInt: { errorMessage: "Price is required" },
   },
 }
+
+const reviewSchema = {
+  comment: {
+    in: ["body"],
+    isString: { errorMessage: "comment is required" },
+  },
+  rate: {
+    in: ["body"],
+    isInt: { errorMessage: "rating is required" },
+  },
+}
+
+export const checkReviewSchema = checkSchema(reviewSchema)
 
 export const checkProductSchema = checkSchema(productSchema)
 export const checkProductValidationResult = (req, res, next) => {
