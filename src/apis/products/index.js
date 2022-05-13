@@ -6,7 +6,12 @@ import {
 } from "./productValidation.js"
 import createError from "http-errors"
 import uniqid from "uniqid"
-import { getProducts, writeProducts } from "../../lib/fs-tools.js"
+import multer from "multer"
+import {
+  getProducts,
+  writeProducts,
+  saveProductsImageUrl,
+} from "../../lib/fs-tools.js"
 
 const productsRouter = express.Router()
 //get all products
@@ -117,6 +122,48 @@ productsRouter.delete("/:productId", async (req, res, next) => {
     next(err)
   }
 })
+
+//product's image upload (POST /product/:id/upload)
+productsRouter.post(
+  "/:productId/upload",
+  multer({
+    fileFilter: (req, file, multerNext) => {
+      if (file.mimetype !== "image/jpeg" && file.mimetype !== "image/png") {
+        multerNext(createError(400, "Only png/jpeg allowed!"))
+      } else {
+        multerNext(null, true)
+      }
+    },
+    limits: { fileSize: 1024 * 1024 * 5 },
+  }).single("imageUrl"),
+  async (req, res, next) => {
+    try {
+      const products = await getProducts()
+      const product = products.findIndex(
+        (product) => product.id === req.params.productId
+      )
+      const url = await saveProductsImageUrl(
+        req.file.originalname,
+        req.file.buffer
+      )
+      if (product !== -1) {
+        const oldProduct = products[product]
+        const newProduct = {
+          ...oldProduct,
+          imageUrl: url,
+          updatedAt: new Date(),
+        }
+        products[product] = newProduct
+        await writeProducts(products)
+        res.send(newProduct)
+      } else {
+        next(createError(404, "Post not found"))
+      }
+    } catch (error) {
+      next(error)
+    }
+  }
+)
 
 //GET list of  Reviews /products/:productId/reviews/
 productsRouter.get("/:productId/reviews", async (req, res, next) => {
