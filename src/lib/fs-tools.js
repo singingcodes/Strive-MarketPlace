@@ -17,6 +17,6 @@ export const saveProductsImageUrl = (fileName, contentAsBuffer) => {
   const savedPath = `/img/products/${fileName}`
   console.log(savedPath)
   writeFile(filePath, contentAsBuffer)
-  const url = `http://localhost:3000${savedPath}`
+  const url = `http://localhost:3001${savedPath}`
   return url
 }
