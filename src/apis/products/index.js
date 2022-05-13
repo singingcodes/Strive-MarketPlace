@@ -13,7 +13,14 @@ const productsRouter = express.Router()
 productsRouter.get("/", async (req, res, next) => {
   try {
     const products = await getProducts()
-    res.send(products)
+    if (req.query && req.query.category) {
+      const filteredProducts = products.filter((product) =>
+        product.category.toLowerCase().includes(req.query.title.toLowerCase())
+      )
+      res.send(filteredProducts)
+    } else {
+      res.send(products)
+    }
   } catch (err) {
     next(err)
   }
