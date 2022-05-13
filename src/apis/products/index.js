@@ -15,7 +15,9 @@ productsRouter.get("/", async (req, res, next) => {
     const products = await getProducts()
     if (req.query && req.query.category) {
       const filteredProducts = products.filter((product) =>
-        product.category.toLowerCase().includes(req.query.title.toLowerCase())
+        product.category
+          .toLowerCase()
+          .includes(req.query.category.toLowerCase())
       )
       res.send(filteredProducts)
     } else {
